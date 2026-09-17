@@ -123,5 +123,6 @@ severs exactly those dependencies; the paper reports the ablation and its cost.
 
 ## License
 
-Apache 2.0. Source sequence data remains under the licence of the originating databases
-(RNAcentral and its member resources).
+Apache 2.0 for the code in this repository. The pretraining corpus deposited on Zenodo is
+released under CC0 1.0, matching the terms of its RNAcentral sources (RNAcentral data has
+been CC0 from release 20 onwards).
