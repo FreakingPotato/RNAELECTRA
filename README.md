@@ -10,9 +10,12 @@ detection (RTD): a lightweight generator proposes plausible nucleotide substitut
 discriminator learns to flag which positions were replaced. Only the discriminator is
 released — it is the encoder used for every downstream task.
 
-This repository holds the pretraining code and the corpus-construction pipeline. It does
-**not** redistribute sequence data; see [`data_processing/`](data_processing/) for the
-exact folder layout and build recipe.
+This repository holds the pretraining code and the corpus-construction pipeline. The
+processed pretraining corpus is deposited on Zenodo ([10.5281/zenodo.22761295][zenodo]);
+see [`data_processing/`](data_processing/) for the source-file provenance, checksums and
+the build recipe if you prefer to rebuild it from the original RNAcentral exports.
+
+[zenodo]: https://doi.org/10.5281/zenodo.22761295
 
 ---
 
