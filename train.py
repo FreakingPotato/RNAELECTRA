@@ -115,7 +115,7 @@ def load_fasta_data(fasta_file, max_length=1024):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=64)
-    parser.add_argument("--learning_rate", type=float, default=3e-4, help="Learning rate")
+    parser.add_argument("--learning_rate", type=float, default=1e-4, help="Learning rate")
     parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--kmer", type=int, default=1)
@@ -234,7 +234,8 @@ def main():
             layer_norm_eps=1e-12,
             norm_eps=1e-12,
             global_rope_theta=10000,
-            local_attention=128,
+            global_attn_every_n_layers=1,   # global attention in every layer
+            local_attention=512,            # inert while every layer is global
             local_rope_theta=1000,
             tie_word_embeddings=False,  # Disable weight tying to avoid shared tensor issues
         )
@@ -254,7 +255,8 @@ def main():
             layer_norm_eps=1e-12,
             norm_eps=1e-12,
             global_rope_theta=10000,
-            local_attention=128,
+            global_attn_every_n_layers=1,   # global attention in every layer
+            local_attention=512,            # inert while every layer is global
             local_rope_theta=1000,
             tie_word_embeddings=False,  # Disable weight tying to avoid shared tensor issues
         )

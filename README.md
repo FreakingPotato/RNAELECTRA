@@ -76,8 +76,21 @@ deepspeed --hostfile hostfile train.py \
     --kmer 1 \
     --masking_ratio 0.15 \
     --batch_size 64 \
-    --epochs 30
+    --epochs 30 \
+    --learning_rate 1e-4 \
+    --generator_size 256 \
+    --discriminator_size 512 \
+    --max_token_length 1025 \
+    --temperature 0.9 \
+    --top_k 2 \
+    --weight_factor 50 \
+    --train_split 0.9 \
+    --seed 42
 ```
+
+This command is the frozen reproduction configuration for the released checkpoint: every
+value the released run used is passed explicitly rather than left to a default, so the
+command stays correct if a default changes later.
 
 `hostfile` is a DeepSpeed host file, one line per node, e.g. `gpu-node-01 slots=4`. For a
 single GPU, drop `--hostfile` and run `python train.py ...`. Checkpoints and the final
@@ -97,6 +110,7 @@ release contains.
 | Discriminator (released) | 22 layers, hidden 512, 16 heads, FFN 2048 |
 | Attention | **global in every layer** (`global_attn_every_n_layers=1`) |
 | Position encoding | RoPE, θ = 10,000 |
+| Learning rate | 1e-4 |
 | Encoder parameters | 92,311,552 |
 | Tokenizer | single nucleotide, vocab 27, max token length 1025 |
 | Sampling | temperature 0.9, top-k 2 |
