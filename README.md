@@ -31,6 +31,11 @@ data_processing/
 ├── build_corpus.py           build the pretraining FASTA from RNAcentral exports
 ├── audit_corpus.py           verify record counts and length distribution
 └── README.md                 expected input layout, filters, reference statistics
+downstream/
+├── benchmark_beacon.py       fine-tuning and evaluation on the BEACON tasks
+├── task_config.py            per-task settings and the encoder entry
+├── metrics.py                metric implementations
+└── README.md                 data layout, run commands, metric definitions
 ```
 
 ## Install
@@ -76,7 +81,7 @@ deepspeed --hostfile hostfile train.py \
     --kmer 1 \
     --masking_ratio 0.15 \
     --batch_size 64 \
-    --epochs 30 \
+    --max_steps 259680 \
     --learning_rate 1e-4 \
     --generator_size 256 \
     --discriminator_size 512 \
@@ -101,6 +106,27 @@ The final export contains three directories — `generator/`, `discriminator/` a
 discriminator's encoder with the RTD head stripped, and it is what the Hugging Face
 release contains.
 
+## Downstream evaluation
+
+[`downstream/`](downstream/) holds the fine-tuning and evaluation code for the BEACON results
+reported in the paper, covering the function and engineering tasks: SPL, APA, NcRNA, Modif,
+MRL, PRS, CRI-On and CRI-Off. The benchmark's released data splits are used unchanged.
+
+```bash
+python downstream/benchmark_beacon.py \
+    --task mrl \
+    --model RNAElectra \
+    --data_dir ./beacon_data \
+    --output_dir ./benchmark_results \
+    --seed 42 \
+    --lr 1e-4 \
+    --batch_size 32
+```
+
+Reported values are the mean over seeds 42, 30 and 2026. See
+[`downstream/README.md`](downstream/README.md) for the data layout, the per-task metric names
+and how to point the runner at a checkpoint other than the released one.
+
 ### Configuration as published
 
 | | |
@@ -111,6 +137,8 @@ release contains.
 | Attention | **global in every layer** (`global_attn_every_n_layers=1`) |
 | Position encoding | RoPE, θ = 10,000 |
 | Learning rate | 1e-4 |
+| Optimisation steps | 259,680 |
+| Effective batch size | 512 (8 GPUs x 64 per device) |
 | Encoder parameters | 92,311,552 |
 | Tokenizer | single nucleotide, vocab 27, max token length 1025 |
 | Sampling | temperature 0.9, top-k 2 |

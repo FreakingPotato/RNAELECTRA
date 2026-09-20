@@ -116,7 +116,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--learning_rate", type=float, default=1e-4, help="Learning rate")
-    parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs")
+    parser.add_argument("--max_steps", type=int, default=259680,
+                        help="Total optimisation steps. The released checkpoint was trained "
+                             "for 259,680 steps at an effective batch of 512")
+    parser.add_argument("--save_steps", type=int, default=8656,
+                        help="Checkpoint and evaluation interval in steps")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--kmer", type=int, default=1)
     parser.add_argument("--output_dir", type=str, default="./PRETRAIN_MODEL", help="Output directory")
@@ -155,7 +159,7 @@ def main():
     
     # Training setup.
     fasta_file_name = os.path.basename(args.fasta_file).split('.')[0]
-    model_name = f"NucEL_RNA_ELECTRA_K{args.kmer}_D{args.discriminator_size}_G{args.generator_size}_M{int(args.masking_ratio * 100)}_E{args.epochs}_B{args.batch_size}_L{args.max_token_length}_{fasta_file_name}_Gadi"
+    model_name = f"NucEL_RNA_ELECTRA_K{args.kmer}_D{args.discriminator_size}_G{args.generator_size}_M{int(args.masking_ratio * 100)}_S{args.max_steps}_B{args.batch_size}_L{args.max_token_length}_{fasta_file_name}_Gadi"
     timestamp = datetime.now().strftime("%Y%m%d%H")
     output_path = f"./PRETRAIN_MODEL/NucEL_further_RNA_a100/{model_name}_K{args.kmer}_{timestamp}"
     os.makedirs(output_path, exist_ok=True)
@@ -280,17 +284,20 @@ def main():
     # Training arguments
     training_args = TrainingArguments(
         output_dir=output_path,
-        num_train_epochs=args.epochs,
+        max_steps=args.max_steps,
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.batch_size,
-        save_strategy="epoch",
+        save_strategy="steps",
+        save_steps=args.save_steps,
         load_best_model_at_end=False,
         metric_for_best_model="eval_loss",
-        eval_strategy="epoch",
+        eval_strategy="steps",
+        eval_steps=args.save_steps,
         greater_is_better=False,
         prediction_loss_only=False,
         logging_dir=f"{output_path}/logs",
-        logging_strategy="epoch",
+        logging_strategy="steps",
+        logging_steps=args.save_steps,
         dataloader_num_workers=min(8, os.cpu_count()),  # Reduced workers to avoid memory issues
         dataloader_pin_memory=True,
          # fp16=True,
